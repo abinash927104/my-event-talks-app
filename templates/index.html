@@ -38,6 +38,10 @@
                     <i data-lucide="refresh-cw" class="btn-icon"></i>
                     <span>Refresh</span>
                 </button>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Light/Dark Theme">
+                    <i data-lucide="sun" class="sun-icon"></i>
+                    <i data-lucide="moon" class="moon-icon"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -48,12 +52,18 @@
                 <i data-lucide="search" class="search-icon"></i>
                 <input type="text" id="search-input" placeholder="Search updates, keywords, dates...">
             </div>
-            <div class="filter-container">
-                <button class="filter-chip active" data-type="all">All</button>
-                <button class="filter-chip" data-type="Feature">Features</button>
-                <button class="filter-chip" data-type="Announcement">Announcements</button>
-                <button class="filter-chip" data-type="Deprecation">Deprecations</button>
-                <button class="filter-chip" data-type="Bug Fix">Bug Fixes</button>
+            <div class="filter-wrapper">
+                <div class="filter-container">
+                    <button class="filter-chip active" data-type="all">All</button>
+                    <button class="filter-chip" data-type="Feature">Features</button>
+                    <button class="filter-chip" data-type="Announcement">Announcements</button>
+                    <button class="filter-chip" data-type="Deprecation">Deprecations</button>
+                    <button class="filter-chip" data-type="Bug Fix">Bug Fixes</button>
+                </div>
+                <button id="export-csv-btn" class="btn btn-secondary" title="Export Filtered Notes to CSV">
+                    <i data-lucide="download" class="btn-icon"></i>
+                    <span>Export CSV</span>
+                </button>
             </div>
         </section>
 

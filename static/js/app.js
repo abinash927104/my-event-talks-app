@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Elements
     const refreshBtn = document.getElementById('refresh-btn');
     const refreshIcon = refreshBtn.querySelector('.btn-icon');
+    const themeToggle = document.getElementById('theme-toggle');
+    const exportCsvBtn = document.getElementById('export-csv-btn');
     const statusContainer = document.getElementById('status-container');
     const lastUpdatedText = document.getElementById('last-updated-text');
     const searchInput = document.getElementById('search-input');
@@ -39,10 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Lucide Icons
     lucide.createIcons();
 
+    // Init Theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
     // Init App
     loadReleaseNotes();
 
     // Event Listeners
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+
+    exportCsvBtn.addEventListener('click', exportFilteredToCSV);
+
     refreshBtn.addEventListener('click', refreshReleaseNotes);
     retryBtn.addEventListener('click', loadReleaseNotes);
     
@@ -324,6 +339,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${upd.html}
                         </div>
                         <div class="card-footer">
+                            <button class="btn btn-secondary btn-copy" data-index="${parsedUpdates.indexOf(upd)}">
+                                <i data-lucide="copy" class="btn-icon"></i>
+                                <span>Copy</span>
+                            </button>
                             <button class="btn btn-secondary btn-tweet" data-index="${parsedUpdates.indexOf(upd)}">
                                 <i data-lucide="twitter" class="btn-icon"></i>
                                 <span>Tweet Update</span>
@@ -338,6 +357,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         notesFeed.innerHTML = feedHtml;
         
+        // Bind copy button event listeners
+        document.querySelectorAll('.btn-copy').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-index'), 10);
+                const upd = parsedUpdates[idx];
+                const textToCopy = `BigQuery ${upd.type} (${upd.entryDate}):\n${upd.cleanText}\n\nSource: ${upd.link}`;
+                navigator.clipboard.writeText(textToCopy)
+                    .then(() => {
+                        showToast("Copied card details to clipboard!");
+                    })
+                    .catch(err => {
+                        console.error("Failed to copy card details: ", err);
+                        showToast("Failed to copy details.");
+                    });
+            });
+        });
+
         // Bind tweet button event listeners
         document.querySelectorAll('.btn-tweet').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -458,5 +494,50 @@ document.addEventListener('DOMContentLoaded', () => {
         errorState.classList.remove('hidden');
         emptyState.classList.add('hidden');
         notesFeed.classList.add('hidden');
+    }
+
+    function exportFilteredToCSV() {
+        const filtered = parsedUpdates.filter(upd => {
+            if (currentFilterType !== 'all' && upd.type !== currentFilterType) {
+                return false;
+            }
+            if (searchQuery) {
+                const matchDate = upd.entryDate.toLowerCase().includes(searchQuery);
+                const matchType = upd.type.toLowerCase().includes(searchQuery);
+                const matchText = upd.cleanText.toLowerCase().includes(searchQuery);
+                return matchDate || matchType || matchText;
+            }
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            showToast("No updates to export!");
+            return;
+        }
+
+        const csvRows = [];
+        csvRows.push('"Date","Category","Description","Link"');
+
+        filtered.forEach(upd => {
+            const escapedDate = upd.entryDate.replace(/"/g, '""');
+            const escapedType = upd.type.replace(/"/g, '""');
+            const escapedText = upd.cleanText.replace(/"/g, '""');
+            const escapedLink = upd.link.replace(/"/g, '""');
+            csvRows.push(`"${escapedDate}","${escapedType}","${escapedText}","${escapedLink}"`);
+        });
+
+        const csvString = csvRows.join('\n');
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `bigquery_release_notes_${currentFilterType}_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast(`Successfully exported ${filtered.length} items to CSV!`);
     }
 });

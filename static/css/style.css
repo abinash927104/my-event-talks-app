@@ -11,6 +11,7 @@
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
+    --dialog-bg: #0f1322;
     
     /* Accents */
     --primary: #6366f1;
@@ -46,6 +47,97 @@
     
     --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light Theme Variables Override */
+:root[data-theme="light"] {
+    --bg-main: #f8fafc;
+    --bg-surface: rgba(255, 255, 255, 0.75);
+    --border-color: rgba(15, 23, 42, 0.08);
+    --border-hover: rgba(15, 23, 42, 0.16);
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    
+    --primary: #4f46e5;
+    --primary-glow: rgba(79, 70, 229, 0.12);
+    --primary-hover: #4338ca;
+    
+    /* Light Theme Card/Badge Types */
+    --bg-feature: rgba(13, 148, 136, 0.08);
+    --border-feature: rgba(13, 148, 136, 0.2);
+    
+    --bg-announcement: rgba(109, 40, 217, 0.08);
+    --border-announcement: rgba(109, 40, 217, 0.2);
+    
+    --bg-deprecation: rgba(180, 83, 9, 0.08);
+    --border-deprecation: rgba(180, 83, 9, 0.2);
+    
+    --bg-bugfix: rgba(4, 120, 87, 0.08);
+    --border-bugfix: rgba(4, 120, 87, 0.2);
+    
+    --bg-general: rgba(71, 85, 105, 0.08);
+    --border-general: rgba(71, 85, 105, 0.2);
+    
+    --dialog-bg: #ffffff;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    color: var(--text-primary);
+    transition: var(--transition-fast);
+}
+
+:root[data-theme="light"] .theme-toggle-btn {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--border-hover);
+}
+
+:root[data-theme="light"] .theme-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.theme-toggle-btn .sun-icon,
+.theme-toggle-btn .moon-icon {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    transition: transform var(--transition-smooth), opacity var(--transition-fast);
+}
+
+/* Default (or explicitly dark) */
+:root:not([data-theme="light"]) .theme-toggle-btn .sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+:root:not([data-theme="light"]) .theme-toggle-btn .moon-icon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0);
+}
+
+/* Light mode overrides */
+:root[data-theme="light"] .theme-toggle-btn .sun-icon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0);
+}
+:root[data-theme="light"] .theme-toggle-btn .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
 }
 
 /* Reset & Base Styles */
@@ -103,6 +195,11 @@ a:hover {
     pointer-events: none;
     z-index: -1;
     filter: blur(80px);
+    transition: background var(--transition-smooth);
+}
+
+:root[data-theme="light"] .glow-bg {
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.04) 0%, rgba(79, 70, 229, 0) 70%);
 }
 
 /* Header Styles */
@@ -324,6 +421,15 @@ a:hover {
 #search-input:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.filter-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100%;
 }
 
 .filter-container {
@@ -594,6 +700,27 @@ a:hover {
     border-top: 1px solid rgba(255, 255, 255, 0.04);
     display: flex;
     justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.btn-copy {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+:root[data-theme="light"] .btn-copy {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.btn-copy:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--border-hover);
+}
+
+:root[data-theme="light"] .btn-copy:hover {
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .btn-tweet {
@@ -634,7 +761,7 @@ a:hover {
 dialog {
     border: none;
     border-radius: var(--radius-xl);
-    background: #0f1322;
+    background: var(--dialog-bg, #0f1322);
     color: var(--text-primary);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     max-width: 550px;
